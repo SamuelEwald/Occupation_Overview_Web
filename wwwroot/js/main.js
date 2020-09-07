@@ -195,16 +195,13 @@
       self.yearFormatted = ko.observable("Jobs(" + jobsData.year + ")");
 
       self.regional = ko.observable(jobsData.regional);
-      self.regionalFormatted = ko.observable(numberWithCommas(jobsData.regional));
+      self.regionalFormatted = ko.observable(NumberWithCommas(jobsData.regional));
 
       self.nationalAvg = ko.observable(jobsData.national_avg);
       //Calculates the % difference between region and national job quantities
-      self.jobsRegionalNationalDifference = ko.computed(function () {
-          let jobDifference = self.regional() - self.nationalAvg();
-          jobDifference = ((jobDifference / self.nationalAvg()) * 100).toFixed(2);
-
-          return jobDifference + "%";
-      });
+      self.jobsRegionalNationalDifference = ko.computed(function(){
+          return DifferenceBetweenTwoNumbers(self.regional(), self.nationalAvg())
+        });
 
       self.jobsRegionalPositive = ko.computed(function () {
         return self.regional() >= self.nationalAvg() ? true : false;
@@ -217,24 +214,22 @@
       self.startYear = ko.observable(jobsGrowthData.start_year);
 
       self.endYear = ko.observable(jobsGrowthData.end_year);
-      self.yearsFormatted = ko.observable("% Change("+self.startYear()+"-"+self.endYear()+")");
+      self.yearsFormatted = ko.observable("% Change("+self.startYear()+"-"+self.endYear()+")"); //Ex. % Change(2013-2020)
 
       self.regional = ko.observable(jobsGrowthData.regional);
 
       self.nationalAvg = ko.observable(jobsGrowthData.national_avg);
 
       self.regionalFormatted = ko.computed(function(){
-        return self.regional() >  0 ? "+"+self.regional()+"%" :  "-"+self.regional()+"%";
+        return self.regional() >  0 ? "+"+self.regional()+"%" :  "-"+self.regional()+"%"; //Ex. -20% OR +43%
       });
       self.nationalAvgFormatted = ko.computed(function(){
-        return self.nationalAvg() > 0 ? "+"+self.nationalAvg()+"%" :  "-"+self.nationalAvg()+"%";
+        return self.nationalAvg() > 0 ? "+"+self.nationalAvg()+"%" :  "-"+self.nationalAvg()+"%"; 
       });
     }
 
     function Earnings(earningsData) {
       let self = this;
-
-      
 
       self.regional = ko.observable(earningsData.regional);
       self.regionalFormatted = ko.observable(FormatHourly(earningsData.regional));
@@ -265,9 +260,10 @@
   function EmployingIndustries(employingIndustriesData) {
     var self = this;
 
-    self.year = ko.observable();
+    self.year = ko.observable(employingIndustriesData.year);
 
-    self.jobs = ko.observable();
+    self.jobs = ko.observable(employingIndustriesData.jobs);
+    let totalOccupationJobs = self.jobs();
 
     self.industries = ko.observableArray();
     var mappedIndustries = ko.utils.arrayMap(
@@ -280,15 +276,25 @@
 
     //Nested models
     function Industry(industryData) {
+
       let self = this;
 
       self.niacs = ko.observable(industryData.niacs);
 
-      self.title = ko.observable(industryData.titel);
+      self.title = ko.observable(industryData.title);
 
       self.inOccupationJobs = ko.observable(industryData.in_occupation_jobs);
 
       self.jobs = ko.observable(industryData.jobs);
+
+      self.calculatedOccupationInIndustry = ko.computed(function(){
+        return (( self.inOccupationJobs() / totalOccupationJobs) * 100).toFixed(1) + "%";
+        
+      });
+
+      self.calculatedTotalJobsInIndustry = ko.computed(function(){
+        return (( self.inOccupationJobs() / self.jobs()) * 100).toFixed(1) + "%";
+    });
     }
   }
 })(); /// NO CODE AFTER THIS LINE
