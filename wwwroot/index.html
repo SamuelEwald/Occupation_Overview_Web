@@ -19,9 +19,13 @@
     <header class="container-fluid">
       <h1>Occupation Overview</h1>
       <h2>
-        <!-- ko text: occupation().title() --><!-- /ko -->
+        <!-- ko with: occupation -->
+            <!-- ko text: title --><!-- /ko -->
+        <!-- /ko -->
         in
-        <!-- ko text: region().title() --><!-- /ko -->
+        <!-- ko with: region -->
+            <!-- ko text: title --><!-- /ko -->
+        <!-- /ko -->
       </h2>
     </header>
     <main class="container-fluid">
@@ -29,7 +33,9 @@
       <section>
         <h3>
           Occupation Summary for
-          <!-- ko text: occupation().title() --><!-- /ko -->
+          <!-- ko with: occupation -->
+            <!-- ko text: title --><!-- /ko -->
+        <!-- /ko -->
         </h3>
         <table></table>
       </section>
@@ -53,7 +59,9 @@
       <section>
         <h3>
           Industries Employing
-          <!-- ko text: occupation().title() --><!-- /ko -->
+          <!-- ko with: occupation -->
+            <!-- ko text: title --><!-- /ko -->
+        <!-- /ko -->
         </h3>
         <table></table>
       </section>

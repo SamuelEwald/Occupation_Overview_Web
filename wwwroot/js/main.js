@@ -27,33 +27,65 @@
     ///// FUNCTION DECLARATIONS /////
     //General Functions
     self.main = main;
-    self.setPageTitle = setPageTitle;
     self.drawOccupationLineChart = drawOccupationLineChart;
 
+    //Setters
+    self.setOccupationOverviewModelData = setOccupationOverviewModelData;
+    self.setPageTitle = setPageTitle;
+
+    //Getters
+
     //API Calls
-    self.getOccupationOverviewData = getOccupationOverviewData;
+
 
     //Event Handlers
 
+
     //Listeners
+
+
+
+    ///// PROMISE DEFINITIONS /////
+    //Functions
+    const getOccupationOverviewDataPromise = function (args) {
+        if (args.requestData == null) {
+            return null;
+        }
+
+        //Returns requested data as a resolved or rejected promise based on data received
+        //Important for daisychaining reactions to receiving data
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: apiRoot + "a2cc3707-8691-4188-8413-6183a7bb3d32",
+                //data: args.requestData ,  //Current request specified by GUID
+                method: "GET",
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+            })
+            .done(function (retrievedOccupationOverviewData) {
+                resolve(retrievedOccupationOverviewData);
+            })
+            .fail(function (error) {
+                console.log(error);
+                alert("API Failed to retrieve data.");
+                reject(false)
+            });
+        });
+    }
+
+    //Declarations
+    self.getOccupationOverviewDataPromise = getOccupationOverviewDataPromise;
+
+
 
     ///// CALL MAIN FUNCTION -- This kicks off the code  /////
     self.main();
 
-    ///// PROMISE DEFINITIONS /////
-    const modelSetPromise = new Promise((resolve, reject) => {
-        let occupationData = self.getOccupationOverviewData(requestArgs)
-        if(occupationData != null){
-            setOccupationOverviewModelData(occupationData);
-            resolve();
-        }else{
-            reject();
-        }
-    });
+
 
     ///// FUNCTION DEFINITIONS /////
     function main() {
-        var requestArgs;
+        var requestArgs = {};
         requestArgs.requestData = JSON.stringify({
             occupation: "15-1131",
             area_type: "msa",
@@ -61,7 +93,9 @@
         });
 
         //Getting/Setting the model data and then once the model is binded, init and draw charts
-        modelSetPromise.then(function(){
+        self.getOccupationOverviewDataPromise(requestArgs).then(function(modelData){
+            self.setOccupationOverviewModelData(modelData)
+        }).then(function(){
             google.charts.load("current", { packages: ["corechart", "line"] });
             google.charts.setOnLoadCallback(drawOccupationLineChart);
 
@@ -89,27 +123,7 @@
         self.employingIndustries(new EmployingIndustries(modelData.employing_industries));
     }
 
-    function getOccupationOverviewData(args) {
-        if (args.requestData == null) {
-            return null;
-        }
-
-        $.ajax({
-            url: apiRoot + "a2cc3707-8691-4188-8413-6183a7bb3d32",
-            //data: args.requestData ,  //Current request specified by GUID
-            method: "GET",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-        })
-        .done(function (retrievedOccupationOverviewData) {
-            return JSON.parse(retrievedOccupationOverviewData);
-        })
-        .fail(function (error) {
-            console.log(error);
-            alert("API Failed to retrieve data.");
-            return null;
-        });
-    }
+    
 
     //Grabbed from https://jsfiddle.net/api/post/library/pure/
     function drawOccupationLineChart() {
@@ -119,27 +133,27 @@
       data.addColumn("number", "Cats");
 
       // Grabbed from https://stackoverflow.com/questions/35972095/google-charts-javascript-using-two-arrays-for-data-input-for-a-line-chart
-      for (var i = 0; i < time.length; i++) {
-        var row = [i, regional[i], state[i], nation[i]];
-        data.addRow(row);
-      }
+    //   for (var i = 0; i < time.length; i++) {
+    //     var row = [i, regional[i], state[i], nation[i]];
+    //     data.addRow(row);
+    //   }
 
-      var options = {
-        hAxis: {
-          title: "Time",
-        },
-        vAxis: {
-          title: "Popularity",
-        },
-        series: {
-          1: { curveType: "function" },
-        },
-      };
+    //   var options = {
+    //     hAxis: {
+    //       title: "Time",
+    //     },
+    //     vAxis: {
+    //       title: "Popularity",
+    //     },
+    //     series: {
+    //       1: { curveType: "function" },
+    //     },
+    //   };
 
-      var chart = new google.visualization.LineChart(
-        document.getElementById("chart_div")
-      );
-      chart.draw(data, options);
+    //   var chart = new google.visualization.LineChart(
+    //     document.getElementById("chart_div")
+    //   );
+    //   chart.draw(data, options);
     }
 
     // ADD NEW FUNCTIONS ABOVE THIS COMMENT
@@ -236,7 +250,7 @@
     self.jobs = ko.observable();
 
     self.industries = ko.observableArray();
-    var mappedIndustries = ko.utils.map(
+    var mappedIndustries = ko.utils.arrayMap(
       employingIndustriesData.industries,
       function (item) {
         return new Industry(item);
