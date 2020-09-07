@@ -37,93 +37,84 @@
 
     //API Calls
 
-
     //Event Handlers
 
-
     //Listeners
-
-
 
     ///// PROMISE DEFINITIONS /////
     //Functions
     const getOccupationOverviewDataPromise = function (args) {
-        if (args.requestData == null) {
-            return null;
-        }
+      if (args.requestData == null) {
+        return null;
+      }
 
-        //Returns requested data as a resolved or rejected promise based on data received
-        //Important for daisychaining reactions to receiving data
-        return new Promise(function(resolve, reject) {
-            $.ajax({
-                url: apiRoot + "a2cc3707-8691-4188-8413-6183a7bb3d32",
-                //data: args.requestData ,  //Current request specified by GUID
-                method: "GET",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-            })
-            .done(function (retrievedOccupationOverviewData) {
-                resolve(retrievedOccupationOverviewData);
-            })
-            .fail(function (error) {
-                console.log(error);
-                alert("API Failed to retrieve data.");
-                reject(false)
-            });
-        });
-    }
+      //Returns requested data as a resolved or rejected promise based on data received
+      //Important for daisychaining reactions to receiving data
+      return new Promise(function (resolve, reject) {
+        $.ajax({
+          url: apiRoot + "a2cc3707-8691-4188-8413-6183a7bb3d32",
+          //data: args.requestData ,  //Current request specified by GUID
+          method: "GET",
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+        })
+          .done(function (retrievedOccupationOverviewData) {
+            resolve(retrievedOccupationOverviewData);
+          })
+          .fail(function (error) {
+            console.log(error);
+            alert("API Failed to retrieve data.");
+            reject(false);
+          });
+      });
+    };
 
     //Declarations
     self.getOccupationOverviewDataPromise = getOccupationOverviewDataPromise;
 
-
-
     ///// CALL MAIN FUNCTION -- This kicks off the code  /////
     self.main();
 
-
-
     ///// FUNCTION DEFINITIONS /////
     function main() {
-        var requestArgs = {};
-        requestArgs.requestData = JSON.stringify({
-            occupation: "15-1131",
-            area_type: "msa",
-            area_code: "42660",
+      var requestArgs = {};
+      requestArgs.requestData = JSON.stringify({
+        occupation: "15-1131",
+        area_type: "msa",
+        area_code: "42660",
+      });
+
+      //Getting/Setting the model data and then once the model is binded, init and draw charts
+      self
+        .getOccupationOverviewDataPromise(requestArgs)
+        .then(function (modelData) {
+          self.setOccupationOverviewModelData(modelData);
+        })
+        .then(function () {
+          google.charts.load("current", { packages: ["corechart", "line"] });
+          google.charts.setOnLoadCallback(drawOccupationLineChart);
+        })
+        .catch(function (error) {
+          console.log("The model data was not set");
+          console.log("Error: " + error);
         });
-
-        //Getting/Setting the model data and then once the model is binded, init and draw charts
-        self.getOccupationOverviewDataPromise(requestArgs).then(function(modelData){
-            self.setOccupationOverviewModelData(modelData)
-        }).then(function(){
-            google.charts.load("current", { packages: ["corechart", "line"] });
-            google.charts.setOnLoadCallback(drawOccupationLineChart);
-
-        }).catch(function(error){
-            console.log("The model data was not set")
-            console.log("Error: " + error)
-
-        });
-        
-
-      
     }
 
     function setPageTitle() {}
 
     function setOccupationOverviewModelData(modelData) {
-        self.occupation(new Occupation(modelData.occupation));
+      self.occupation(new Occupation(modelData.occupation));
 
-        self.region(new Region(modelData.region));
+      self.region(new Region(modelData.region));
 
-        self.summary(new Summary(modelData.summary));
+      self.summary(new Summary(modelData.summary));
 
-        self.trendComparison(new TrendComparison(modelData.trend_comparison));
+      self.trendComparison(new TrendComparison(modelData.trend_comparison));
 
-        self.employingIndustries(new EmployingIndustries(modelData.employing_industries));
+      self.employingIndustries(
+        new EmployingIndustries(modelData.employing_industries)
+      );
     }
-
-    
 
     //Grabbed from https://jsfiddle.net/api/post/library/pure/
     function drawOccupationLineChart() {
@@ -133,27 +124,27 @@
       data.addColumn("number", "Cats");
 
       // Grabbed from https://stackoverflow.com/questions/35972095/google-charts-javascript-using-two-arrays-for-data-input-for-a-line-chart
-    //   for (var i = 0; i < time.length; i++) {
-    //     var row = [i, regional[i], state[i], nation[i]];
-    //     data.addRow(row);
-    //   }
+      //   for (var i = 0; i < time.length; i++) {
+      //     var row = [i, regional[i], state[i], nation[i]];
+      //     data.addRow(row);
+      //   }
 
-    //   var options = {
-    //     hAxis: {
-    //       title: "Time",
-    //     },
-    //     vAxis: {
-    //       title: "Popularity",
-    //     },
-    //     series: {
-    //       1: { curveType: "function" },
-    //     },
-    //   };
+      //   var options = {
+      //     hAxis: {
+      //       title: "Time",
+      //     },
+      //     vAxis: {
+      //       title: "Popularity",
+      //     },
+      //     series: {
+      //       1: { curveType: "function" },
+      //     },
+      //   };
 
-    //   var chart = new google.visualization.LineChart(
-    //     document.getElementById("chart_div")
-    //   );
-    //   chart.draw(data, options);
+      //   var chart = new google.visualization.LineChart(
+      //     document.getElementById("chart_div")
+      //   );
+      //   chart.draw(data, options);
     }
 
     // ADD NEW FUNCTIONS ABOVE THIS COMMENT
@@ -201,10 +192,21 @@
       let self = this;
 
       self.year = ko.observable(jobsData.year);
+      self.yearFormatted = ko.observable("Jobs(" + jobsData.year + ")");
 
       self.regional = ko.observable(jobsData.regional);
 
       self.nationalAvg = ko.observable(jobsData.national_avg);
+      //Calculates the % difference between region and national job quantities
+      self.jobsRegionalNationalDifference = ko.computed(function () {
+          let jobDifference = self.regional() - self.nationalAvg();
+          jobDifference = (jobDifference / self.nationalAvg()) * 100;
+          return jobDifference;
+      });
+
+      self.jobsRegionalPositive = ko.computed(function () {
+        return self.regional() >= self.nationalAvg() ? true : false;
+      });
     }
 
     function JobsGrowth(jobsGrowthData) {
@@ -213,18 +215,35 @@
       self.startYear = ko.observable(jobsGrowthData.start_year);
 
       self.endYear = ko.observable(jobsGrowthData.end_year);
+      self.yearsFormatted = ko.observable("% Change("+self.startYear()+"-"+self.endYear()+")");
 
       self.regional = ko.observable(jobsGrowthData.regional);
+   
 
       self.nationalAvg = ko.observable(jobsGrowthData.national_avg);
+
+      self.regionalFormatted = ko.computed(function(){
+        return self.regional() >  0 ? "+"+self.regional()+"%" :  "-"+self.regional()+"%";
+      });
+      self.nationalAvgFormatted = ko.computed(function(){
+        return self.nationalAvg() > 0 ? "+"+self.nationalAvg()+"%" :  "-"+self.nationalAvg()+"%";
+      });
     }
 
     function Earnings(earningsData) {
       let self = this;
 
+      
+
       self.regional = ko.observable(earningsData.regional);
+      self.regionalFormatted = ko.observable(FormatHourly(earningsData.regional));
 
       self.nationalAvg = ko.observable(earningsData.national_avg);
+      self.nationalAvgFormatted = ko.observable("Nation:"+ FormatHourly(earningsData.national_avg));
+
+      function FormatHourly(item){
+        return "$"+item+"/hr"
+      }
     }
   }
 

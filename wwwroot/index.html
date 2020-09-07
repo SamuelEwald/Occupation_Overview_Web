@@ -31,13 +31,27 @@
     <main class="container-fluid">
       <!-- SUMMARY SECTION-->
       <section>
-        <h3>
+        <h3 data-bind="with: occupation">
           Occupation Summary for
-          <!-- ko with: occupation -->
-            <!-- ko text: title --><!-- /ko -->
-        <!-- /ko -->
+                <!-- ko text: title --><!-- /ko -->
         </h3>
-        <table></table>
+        <div class="row" data-bind="with: summary">
+            <div class="col-sm" data-bind="with: jobs">
+                <span data-bind="text: regional"></span>
+                <span data-bind="text: yearFormatted"></span>
+                <span data-bind="text: jobsRegionalNationalDifference"></span>
+            </div>
+            <div class="col-sm" data-bind="with: jobsGrowth">
+                <span data-bind="text: regionalFormatted"></span>
+                <span data-bind="text: yearsFormatted"></span>
+                <span data-bind="text: nationalAvgFormatted"></span>
+            </div>
+            <div class="col-sm" data-bind="with: earnings">
+                <span data-bind="text: regionalFormatted"></span>
+                <span>Median Hourly Earnings</span>
+                <span data-bind="text: nationalAvgFormatted"></span>
+            </div>
+        </div>
       </section>
 
       <!-- TRENDS SECTION-->
