@@ -19,6 +19,10 @@
     //Values
     self.pageTitle = ko.observable();
     self.occupation = ko.observable();
+    self.region = ko.observable();
+    self.summary = ko.observable();
+    self.trendComparison = ko.observable();
+    self.employingIndustries = ko.observable();
 
     ///// FUNCTION DECLARATIONS /////
     //General Functions
@@ -36,45 +40,75 @@
     ///// CALL MAIN FUNCTION -- This kicks off the code  /////
     self.main();
 
+    ///// PROMISE DEFINITIONS /////
+    const modelSetPromise = new Promise((resolve, reject) => {
+        let occupationData = self.getOccupationOverviewData(requestArgs)
+        if(occupationData != null){
+            setOccupationOverviewModelData(occupationData);
+            resolve();
+        }else{
+            reject();
+        }
+    });
+
     ///// FUNCTION DEFINITIONS /////
     function main() {
-     
-        google.charts.load('current', {packages: ['corechart', 'line']});
-        google.charts.setOnLoadCallback(drawOccupationLineChart);
-    }
+        var requestArgs;
+        requestArgs.requestData = JSON.stringify({
+            occupation: "15-1131",
+            area_type: "msa",
+            area_code: "42660",
+        });
 
-    function setPageTitle() {
+        //Getting/Setting the model data and then once the model is binded, init and draw charts
+        modelSetPromise.then(function(){
+            google.charts.load("current", { packages: ["corechart", "line"] });
+            google.charts.setOnLoadCallback(drawOccupationLineChart);
 
-    }
+        }).catch(function(error){
+            console.log("The model data was not set")
+            console.log("Error: " + error)
 
-    function setOccupationOverviewModelData(){
-        self.occupation(new Occupation(retrievedOccupationOverviewData.occupation))
-
-
+        });
         
+
+      
+    }
+
+    function setPageTitle() {}
+
+    function setOccupationOverviewModelData(modelData) {
+        self.occupation(new Occupation(modelData.occupation));
+
+        self.region(new Region(modelData.region));
+
+        self.summary(new Summary(modelData.summary));
+
+        self.trendComparison(new TrendComparison(modelData.trend_comparison));
+
+        self.employingIndustries(new EmployingIndustries(modelData.employing_industries));
     }
 
     function getOccupationOverviewData(args) {
-        //args.requestData = {
-            "occupation": "15-1131",
-            "area_type": "msa",
-            "area_code": "42660"
+        if (args.requestData == null) {
+            return null;
         }
 
-      $.ajax({
-        url: apiRoot + "a2cc3707-8691-4188-8413-6183a7bb3d32",
-        data: 
-        method: "GET",
-        dataType: "json",
-        contentType: "application/json; charset=utf-8",
-      }).done(function(retrievedOccupationOverviewData) {
-
-        return JSON.parse(retrievedOccupationOverviewData)
-
-      }).fail(function () {
-        alert("API Failed to retrieve data.")
-        return null;
-      });
+        $.ajax({
+            url: apiRoot + "a2cc3707-8691-4188-8413-6183a7bb3d32",
+            //data: args.requestData ,  //Current request specified by GUID
+            method: "GET",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+        })
+        .done(function (retrievedOccupationOverviewData) {
+            return JSON.parse(retrievedOccupationOverviewData);
+        })
+        .fail(function (error) {
+            console.log(error);
+            alert("API Failed to retrieve data.");
+            return null;
+        });
     }
 
     //Grabbed from https://jsfiddle.net/api/post/library/pure/
@@ -106,7 +140,6 @@
         document.getElementById("chart_div")
       );
       chart.draw(data, options);
-      
     }
 
     // ADD NEW FUNCTIONS ABOVE THIS COMMENT
