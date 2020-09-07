@@ -195,13 +195,15 @@
       self.yearFormatted = ko.observable("Jobs(" + jobsData.year + ")");
 
       self.regional = ko.observable(jobsData.regional);
+      self.regionalFormatted = ko.observable(numberWithCommas(jobsData.regional));
 
       self.nationalAvg = ko.observable(jobsData.national_avg);
       //Calculates the % difference between region and national job quantities
       self.jobsRegionalNationalDifference = ko.computed(function () {
           let jobDifference = self.regional() - self.nationalAvg();
-          jobDifference = (jobDifference / self.nationalAvg()) * 100;
-          return jobDifference;
+          jobDifference = ((jobDifference / self.nationalAvg()) * 100).toFixed(2);
+
+          return jobDifference + "%";
       });
 
       self.jobsRegionalPositive = ko.computed(function () {
@@ -218,7 +220,6 @@
       self.yearsFormatted = ko.observable("% Change("+self.startYear()+"-"+self.endYear()+")");
 
       self.regional = ko.observable(jobsGrowthData.regional);
-   
 
       self.nationalAvg = ko.observable(jobsGrowthData.national_avg);
 

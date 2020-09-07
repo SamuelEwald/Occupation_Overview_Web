@@ -1,0 +1,38 @@
+body{
+    margin: 0 24px;
+}
+h1{
+    font-size
+}
+
+h1,h2,h3,h4{
+    color: #444;
+}
+
+header, section{
+    margin: 30px 0;
+}
+
+
+
+
+.summary-item{
+    text-align: center;
+}
+
+.summary-subitem{
+    display: block;
+}
+
+
+.highlight-green{
+    color: #2cc32c;
+}
+
+.highlight-red{
+    color: #c32c2c
+}
+
+.center-content{
+    margin: 0 auto;
+}

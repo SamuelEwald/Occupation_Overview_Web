@@ -18,7 +18,7 @@
   <body>
     <header class="container-fluid">
       <h1>Occupation Overview</h1>
-      <h2>
+      <h3>
         <!-- ko with: occupation -->
             <!-- ko text: title --><!-- /ko -->
         <!-- /ko -->
@@ -26,7 +26,7 @@
         <!-- ko with: region -->
             <!-- ko text: title --><!-- /ko -->
         <!-- /ko -->
-      </h2>
+      </h3>
     </header>
     <main class="container-fluid">
       <!-- SUMMARY SECTION-->
@@ -36,20 +36,25 @@
                 <!-- ko text: title --><!-- /ko -->
         </h3>
         <div class="row" data-bind="with: summary">
-            <div class="col-sm" data-bind="with: jobs">
-                <span data-bind="text: regional"></span>
-                <span data-bind="text: yearFormatted"></span>
-                <span data-bind="text: jobsRegionalNationalDifference"></span>
+            <div class="col-sm summary-item" data-bind="with: jobs">
+                <span class="summary-subitem" data-bind="text: regionalFormatted"></span>
+                <span class="summary-subitem" data-bind="text: yearFormatted"></span>
+                <span class="summary-subitem">
+                    <!-- ko text: jobsRegionalNationalDifference --><!-- /ko -->
+                    <span data-bind="css: { 'highlight-green': jobsRegionalPositive(), 'hightlight-red': !jobsRegionalPositive() }"><!-- ko text: jobsRegionalPositive() ? 'above' : 'below' --><!-- /ko --></span>
+                    <span> National average</span>
+                </span>
+                
             </div>
-            <div class="col-sm" data-bind="with: jobsGrowth">
-                <span data-bind="text: regionalFormatted"></span>
-                <span data-bind="text: yearsFormatted"></span>
-                <span data-bind="text: nationalAvgFormatted"></span>
+            <div class="col-sm summary-item" data-bind="with: jobsGrowth">
+                <span class="summary-subitem" data-bind="text: regionalFormatted"></span>
+                <span class="summary-subitem" data-bind="text: yearsFormatted"></span>
+                <span class="summary-subitem" data-bind="text: nationalAvgFormatted"></span>
             </div>
-            <div class="col-sm" data-bind="with: earnings">
-                <span data-bind="text: regionalFormatted"></span>
-                <span>Median Hourly Earnings</span>
-                <span data-bind="text: nationalAvgFormatted"></span>
+            <div class="col-sm summary-item" data-bind="with: earnings">
+                <span class="summary-subitem" data-bind="text: regionalFormatted"></span>
+                <span class="summary-subitem" >Median Hourly Earnings</span>
+                <span class="summary-subitem" data-bind="text: nationalAvgFormatted"></span>
             </div>
         </div>
       </section>
