@@ -123,28 +123,28 @@
       data.addColumn("number", "Dogs");
       data.addColumn("number", "Cats");
 
-      // Grabbed from https://stackoverflow.com/questions/35972095/google-charts-javascript-using-two-arrays-for-data-input-for-a-line-chart
-      //   for (var i = 0; i < time.length; i++) {
-      //     var row = [i, regional[i], state[i], nation[i]];
-      //     data.addRow(row);
-      //   }
+      //Grabbed from https://stackoverflow.com/questions/35972095/google-charts-javascript-using-two-arrays-for-data-input-for-a-line-chart
+        for (var i = 0; i < time.length; i++) {
+          var row = [i, regional[i], state[i], nation[i]];
+          data.addRow(row);
+        }
 
-      //   var options = {
-      //     hAxis: {
-      //       title: "Time",
-      //     },
-      //     vAxis: {
-      //       title: "Popularity",
-      //     },
-      //     series: {
-      //       1: { curveType: "function" },
-      //     },
-      //   };
+        var options = {
+          hAxis: {
+            title: "Time",
+          },
+          vAxis: {
+            title: "Popularity",
+          },
+          series: {
+            1: { curveType: "function" },
+          },
+        };
 
-      //   var chart = new google.visualization.LineChart(
-      //     document.getElementById("chart_div")
-      //   );
-      //   chart.draw(data, options);
+        var chart = new google.visualization.LineChart(
+          document.getElementById("chart_div")
+        );
+        chart.draw(data, options);
     }
 
     // ADD NEW FUNCTIONS ABOVE THIS COMMENT
@@ -250,12 +250,20 @@
 
     self.endYear = ko.observable(trendComparisonData.end_year);
 
-    self.regional = ko.observableArray();
+    self.regional = ko.observableArray(trendComparisonData.regional);
 
-    self.state = ko.observableArray();
+    self.state = ko.observableArray(trendComparisonData.state);
 
-    self.nation = ko.observableArray();
+    self.nation = ko.observableArray(trendComparisonData.nation);
+
+    self.regionObject = ko.observable({});
+    self.stateObject = ko.observable({});
+    self.nationObject = ko.observable({});
+
+
+    
   }
+
 
   function EmployingIndustries(employingIndustriesData) {
     var self = this;

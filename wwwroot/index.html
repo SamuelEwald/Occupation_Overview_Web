@@ -88,11 +88,11 @@
       </section>
 
       <!-- TRENDS SECTION-->
-      <section>
+      <section data-bind="with: trendComparison">
         <h3>Regional Trends</h3>
         <div id="OccupationLineChart"></div>
-        <table>
-          <thead></thead>
+        <table class="table">
+           
         </table>
       </section>
 
@@ -162,6 +162,8 @@
     ></script>
 
     <!-- INTERNAL SCRIPTS -->
+    <script src="js/polyfills.js"></script>
+
     <script src="js/utils.js"></script>
 
     <script src="js/main.js"></script>
