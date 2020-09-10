@@ -85,9 +85,9 @@
       });
 
       //Changes the title if the occupation changes
-      self.occupation.subscribe(function(newValue){
+      self.occupation.subscribe(function (newValue) {
         self.setPageTitle(newValue.title());
-      })
+      });
 
       //Getting/Setting the model data and then once the model is binded, init and draw charts
       self
@@ -127,7 +127,7 @@
     //Grabbed from https://jsfiddle.net/api/post/library/pure/
     function drawOccupationLineChart() {
       var data = new google.visualization.DataTable();
-      data.addColumn("string", "Year")
+      data.addColumn("string", "Year");
       data.addColumn("number", "Region");
       data.addColumn("number", "State");
       data.addColumn("number", "Nation");
@@ -136,32 +136,36 @@
       let trendObject = self.trendComparison();
 
       for (var i = 0; i < trendObject.regional().length; i++) {
-        var row = [trendObject.years()[i], trendObject.formattedRegional()[i], trendObject.formattedState()[i], trendObject.formattedNation()[i]];
+        var row = [
+          trendObject.years()[i],
+          trendObject.formattedRegional()[i],
+          trendObject.formattedState()[i],
+          trendObject.formattedNation()[i],
+        ];
         data.addRow(row);
       }
 
-      
       //Chart Options and Formatting
-      let chartDashStyle = [2, 2, 20, 2, 20, 2]; 
-      
+      let chartDashStyle = [2, 2, 20, 2, 20, 2];
+
       var options = {
         vAxis: {
           title: "Percent Change",
+          slantedText:false,
         },
         hAxis: {
           minValue: trendObject.startYear(),
-          maxValue: trendObject.endYear()
-        }, 
+          maxValue: trendObject.endYear(),
+        },
         series: {
-          0: { pointShape: 'circle', lineDashStyle: chartDashStyle },
-          1: { pointShape: 'square', lineDashStyle: chartDashStyle },
-          2: { pointShape: 'triangle', lineDashStyle: chartDashStyle },
+          0: { pointShape: "circle", lineDashStyle: chartDashStyle },
+          1: { pointShape: "square", lineDashStyle: chartDashStyle },
+          2: { pointShape: "triangle", lineDashStyle: chartDashStyle },
         },
         pointSize: 8,
-        colors: ['#142850','#1185c4','#abdafc'],
-      
+        colors: ["#142850", "#1185c4", "#abdafc"],
+        legend: { position: "none" },
       };
-
 
       var chart = new google.visualization.LineChart(
         document.getElementById("OccupationLineChart")
@@ -217,15 +221,23 @@
       self.yearFormatted = ko.observable("Jobs(" + jobsData.year + ")");
 
       self.regional = ko.observable(jobsData.regional);
-      self.regionalFormatted = ko.observable(NumberWithCommas(jobsData.regional));
+      self.regionalFormatted = ko.observable(
+        NumberWithCommas(jobsData.regional)
+      );
 
       self.nationalAvg = ko.observable(jobsData.national_avg);
 
       //Calculates the % difference between region and national job quantities
-      self.jobsRegionalNationalDifference = ko.computed(function(){
-          return PercentageDifferenceBetweenTwoNumbers(self.regional(), self.nationalAvg(),2)
-        });
-        //Checks whether or not the regional jobs are higher than the national jobs
+      self.jobsRegionalNationalDifference = ko.computed(function () {
+        return (
+          PercentageDifferenceBetweenTwoNumbers(
+            self.regional(),
+            self.nationalAvg(),
+            2
+          ) + "%"
+        );
+      });
+      //Checks whether or not the regional jobs are higher than the national jobs
       self.jobsRegionalPositive = ko.computed(function () {
         return self.regional() >= self.nationalAvg() ? true : false;
       });
@@ -237,30 +249,34 @@
       self.startYear = ko.observable(jobsGrowthData.start_year);
 
       self.endYear = ko.observable(jobsGrowthData.end_year);
-      self.yearsFormatted = ko.observable("% Change("+self.startYear()+"-"+self.endYear()+")"); //Ex. % Change(2013-2020)
+      self.yearsFormatted = ko.observable(
+        "% Change(" + self.startYear() + "-" + self.endYear() + ")"
+      ); //Ex. % Change(2013-2020)
 
       self.regional = ko.observable(jobsGrowthData.regional);
 
       self.nationalAvg = ko.observable(jobsGrowthData.national_avg);
 
-      self.regionalFormatted = ko.computed(function(){
-        return FormatGrowthPercentage(self.regional()); //Ex. -20% OR +43%
+      self.regionalFormatted = ko.computed(function () {
+        return FormatPercentageValueSign(self.regional()); //Ex. -20% OR +43%
       });
-      self.nationalAvgFormatted = ko.computed(function(){
-        return FormatGrowthPercentage(self.nationalAvg()); 
+      self.nationalAvgFormatted = ko.computed(function () {
+        return FormatPercentageValueSign(self.nationalAvg());
       });
-
     }
 
     function Earnings(earningsData) {
       let self = this;
 
       self.regional = ko.observable(earningsData.regional);
-      self.regionalFormatted = ko.observable(FormatHourly(earningsData.regional));
+      self.regionalFormatted = ko.observable(
+        FormatHourly(earningsData.regional)
+      );
 
       self.nationalAvg = ko.observable(earningsData.national_avg);
-      self.nationalAvgFormatted = ko.observable("Nation:"+ FormatHourly(earningsData.national_avg));
-     
+      self.nationalAvgFormatted = ko.observable(
+        "Nation:" + FormatHourly(earningsData.national_avg)
+      );
     }
   }
 
@@ -272,29 +288,34 @@
     self.endYear = ko.observable(trendComparisonData.end_year);
 
     self.regional = ko.observableArray(trendComparisonData.regional);
-    self.formattedRegional = ko.observableArray(GetArrayPercentChanged(trendComparisonData.regional));
+    self.formattedRegional = ko.observableArray(
+      GetArrayPercentChanged(trendComparisonData.regional)
+    );
 
     self.state = ko.observableArray(trendComparisonData.state);
-    self.formattedState = ko.observableArray(GetArrayPercentChanged(trendComparisonData.state));
+    self.formattedState = ko.observableArray(
+      GetArrayPercentChanged(trendComparisonData.state)
+    );
 
     self.nation = ko.observableArray(trendComparisonData.nation);
-    self.formattedNation = ko.observableArray(GetArrayPercentChanged(trendComparisonData.nation));
+    self.formattedNation = ko.observableArray(
+      GetArrayPercentChanged(trendComparisonData.nation)
+    );
 
     self.regionObject = ko.observable({});
     self.stateObject = ko.observable({});
     self.nationObject = ko.observable({});
 
     //Returns an array of all years starting with the start year and ending with the end year
-    self.years = ko.computed(function(){
+    self.years = ko.computed(function () {
       let yearArray = [];
-      let yearSpan = (self.endYear() - self.startYear() + 1); //Add one to account for the start year
-      for(var i = 0; i < yearSpan; i++){
-        yearArray.push(String(self.startYear()+i))
+      let yearSpan = self.endYear() - self.startYear() + 1; //Add one to account for the start year
+      for (var i = 0; i < yearSpan; i++) {
+        yearArray.push(String(self.startYear() + i));
       }
-      return yearArray
+      return yearArray;
     });
   }
-
 
   function EmployingIndustries(employingIndustriesData) {
     var self = this;
@@ -315,7 +336,6 @@
 
     //Nested models
     function Industry(industryData) {
-
       let self = this;
 
       self.niacs = ko.observable(industryData.niacs);
@@ -326,14 +346,13 @@
 
       self.jobs = ko.observable(industryData.jobs);
 
-      self.calculatedOccupationInIndustry = ko.computed(function(){
-        return PercentageDifferenceBetweenTwoNumbers(self.inOccupationJobs(),totalOccupationJobs,1) + "%";
-        
+      self.calculatedOccupationInIndustry = ko.computed(function () {
+        return (( self.inOccupationJobs() / totalOccupationJobs) * 100).toFixed(1) + "%";
       });
 
-      self.calculatedTotalJobsInIndustry = ko.computed(function(){
-        return PercentageDifferenceBetweenTwoNumbers(self.inOccupationJobs(),self.jobs(),1)+ "%";
-    });
+      self.calculatedTotalJobsInIndustry = ko.computed(function () {
+        return (( self.inOccupationJobs() / self.jobs()) * 100).toFixed(1) + "%";
+      });
     }
   }
 })(); /// NO CODE AFTER THIS LINE

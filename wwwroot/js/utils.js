@@ -23,10 +23,12 @@ function PercentageDifferenceBetweenTwoNumbers(
   }
 }
 
-function FormatGrowthPercentage(value) {
+//Formats a percentage with the appropriate positive or negative sign
+function FormatPercentageValueSign(value) {
   return value > 0 ? "+" + value + "%" : "-" + value + "%";
 }
 
+//Simply formats an hourly rate of pay
 function FormatHourly(item) {
   return "$" + item + "/hr";
 }

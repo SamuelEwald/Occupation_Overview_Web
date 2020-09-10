@@ -35,10 +35,12 @@
     </header>
     <main class="container-fluid">
       <!-- SUMMARY SECTION-->
-      <section>
+      <section id="summarySection">
         <h3 data-bind="with: occupation">
-          Occupation Summary for
-          <!-- ko text: title --><!-- /ko -->
+          <strong>
+            Occupation Summary for
+            <!-- ko text: title --><!-- /ko -->
+        </strong>
         </h3>
         <div class="row" data-bind="with: summary">
           <div class="col-sm summary-item" data-bind="with: jobs">
@@ -89,7 +91,7 @@
 
       <!-- TRENDS SECTION-->
       <section data-bind="with: trendComparison">
-        <h3>Regional Trends</h3>
+        <h3><strong>Regional Trends</strong></h3>
         <div id="OccupationLineChart"></div>
         <table class="table">
            
@@ -99,10 +101,12 @@
       <!-- INDUSTRIES SECTION-->
       <section>
         <h3>
-          Industries Employing
-          <!-- ko with: occupation -->
-          <!-- ko text: title --><!-- /ko -->
-          <!-- /ko -->
+          <strong>
+            Industries Employing
+            <!-- ko with: occupation -->
+            <!-- ko text: title --><!-- /ko -->
+            <!-- /ko -->
+        </strong>
         </h3>
         <table class="table" data-bind="with: employingIndustries">
           <thead>
