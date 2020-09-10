@@ -250,10 +250,6 @@
         return FormatGrowthPercentage(self.nationalAvg()); 
       });
 
-      //Methods 
-      function FormatGrowthPercentage(value){
-        return value >  0 ? "+"+value+"%" :  "-"+value+"%";
-      }
     }
 
     function Earnings(earningsData) {
@@ -264,11 +260,7 @@
 
       self.nationalAvg = ko.observable(earningsData.national_avg);
       self.nationalAvgFormatted = ko.observable("Nation:"+ FormatHourly(earningsData.national_avg));
-
-      //Methods
-      function FormatHourly(item){
-        return "$"+item+"/hr"
-      }
+     
     }
   }
 
@@ -292,6 +284,7 @@
     self.stateObject = ko.observable({});
     self.nationObject = ko.observable({});
 
+    //Returns an array of all years starting with the start year and ending with the end year
     self.years = ko.computed(function(){
       let yearArray = [];
       let yearSpan = (self.endYear() - self.startYear() + 1); //Add one to account for the start year
@@ -300,19 +293,6 @@
       }
       return yearArray
     });
-    
-    function GetArrayPercentChanged(valueArray){
-        var newArray = []
-        for(var i = 0; i < valueArray.length; i++){
-          if(newArray.length == 0){
-            newArray.push(valueArray[0])
-          }else{
-            newArray.push(PercentageDifferenceBetweenTwoNumbers(valueArray[i],valueArray[i-1],2))
-          }
-        }
-        newArray[0] = 0; //Set the new formatted array's first number to 0, it is our baseline number.
-        return newArray;
-    }
   }
 
 
