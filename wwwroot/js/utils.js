@@ -6,8 +6,14 @@ function NumberWithCommas(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-function DifferenceBetweenTwoNumbers(firstNumber,secondNumber) {
-    let x = firstNumber - secondNumber;
-    x = (x / secondNumber * 100).toFixed(2);
-    return x + "%";
+function PercentageDifferenceBetweenTwoNumbers(firstNumber,secondNumber,digits) {
+    try{
+        let x = firstNumber - secondNumber;
+        x = (x / secondNumber * 100).toFixed(digits);
+        return parseFloat(x);
+    }catch(error){
+        console.log(error);
+        
+    }
+    
 }

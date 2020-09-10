@@ -84,6 +84,11 @@
         area_code: "42660",
       });
 
+      //Changes the title if the occupation changes
+      self.occupation.subscribe(function(newValue){
+        self.setPageTitle(newValue.title());
+      })
+
       //Getting/Setting the model data and then once the model is binded, init and draw charts
       self
         .getOccupationOverviewDataPromise(requestArgs)
@@ -100,7 +105,10 @@
         });
     }
 
-    function setPageTitle() {}
+    function setPageTitle(newTitle) {
+      let newTitleString = "Occupation Overview - " + newTitle;
+      self.pageTitle(newTitleString);
+    }
 
     function setOccupationOverviewModelData(modelData) {
       self.occupation(new Occupation(modelData.occupation));
@@ -119,32 +127,46 @@
     //Grabbed from https://jsfiddle.net/api/post/library/pure/
     function drawOccupationLineChart() {
       var data = new google.visualization.DataTable();
-      data.addColumn("number", "X");
-      data.addColumn("number", "Dogs");
-      data.addColumn("number", "Cats");
+      data.addColumn("string", "Year")
+      data.addColumn("number", "Region");
+      data.addColumn("number", "State");
+      data.addColumn("number", "Nation");
 
       //Grabbed from https://stackoverflow.com/questions/35972095/google-charts-javascript-using-two-arrays-for-data-input-for-a-line-chart
-        for (var i = 0; i < time.length; i++) {
-          var row = [i, regional[i], state[i], nation[i]];
-          data.addRow(row);
-        }
+      let trendObject = self.trendComparison();
 
-        var options = {
-          hAxis: {
-            title: "Time",
-          },
-          vAxis: {
-            title: "Popularity",
-          },
-          series: {
-            1: { curveType: "function" },
-          },
-        };
+      for (var i = 0; i < trendObject.regional().length; i++) {
+        var row = [trendObject.years()[i], trendObject.formattedRegional()[i], trendObject.formattedState()[i], trendObject.formattedNation()[i]];
+        data.addRow(row);
+      }
 
-        var chart = new google.visualization.LineChart(
-          document.getElementById("chart_div")
-        );
-        chart.draw(data, options);
+      
+      //Chart Options and Formatting
+      let chartDashStyle = [2, 2, 20, 2, 20, 2]; 
+      
+      var options = {
+        vAxis: {
+          title: "Percent Change",
+        },
+        hAxis: {
+          minValue: trendObject.startYear(),
+          maxValue: trendObject.endYear()
+        }, 
+        series: {
+          0: { pointShape: 'circle', lineDashStyle: chartDashStyle },
+          1: { pointShape: 'square', lineDashStyle: chartDashStyle },
+          2: { pointShape: 'triangle', lineDashStyle: chartDashStyle },
+        },
+        pointSize: 8,
+        colors: ['#142850','#1185c4','#abdafc'],
+      
+      };
+
+
+      var chart = new google.visualization.LineChart(
+        document.getElementById("OccupationLineChart")
+      );
+      chart.draw(data, options);
     }
 
     // ADD NEW FUNCTIONS ABOVE THIS COMMENT
@@ -198,11 +220,12 @@
       self.regionalFormatted = ko.observable(NumberWithCommas(jobsData.regional));
 
       self.nationalAvg = ko.observable(jobsData.national_avg);
+
       //Calculates the % difference between region and national job quantities
       self.jobsRegionalNationalDifference = ko.computed(function(){
-          return DifferenceBetweenTwoNumbers(self.regional(), self.nationalAvg())
+          return PercentageDifferenceBetweenTwoNumbers(self.regional(), self.nationalAvg(),2)
         });
-
+        //Checks whether or not the regional jobs are higher than the national jobs
       self.jobsRegionalPositive = ko.computed(function () {
         return self.regional() >= self.nationalAvg() ? true : false;
       });
@@ -221,11 +244,16 @@
       self.nationalAvg = ko.observable(jobsGrowthData.national_avg);
 
       self.regionalFormatted = ko.computed(function(){
-        return self.regional() >  0 ? "+"+self.regional()+"%" :  "-"+self.regional()+"%"; //Ex. -20% OR +43%
+        return FormatGrowthPercentage(self.regional()); //Ex. -20% OR +43%
       });
       self.nationalAvgFormatted = ko.computed(function(){
-        return self.nationalAvg() > 0 ? "+"+self.nationalAvg()+"%" :  "-"+self.nationalAvg()+"%"; 
+        return FormatGrowthPercentage(self.nationalAvg()); 
       });
+
+      //Methods 
+      function FormatGrowthPercentage(value){
+        return value >  0 ? "+"+value+"%" :  "-"+value+"%";
+      }
     }
 
     function Earnings(earningsData) {
@@ -237,6 +265,7 @@
       self.nationalAvg = ko.observable(earningsData.national_avg);
       self.nationalAvgFormatted = ko.observable("Nation:"+ FormatHourly(earningsData.national_avg));
 
+      //Methods
       function FormatHourly(item){
         return "$"+item+"/hr"
       }
@@ -251,17 +280,39 @@
     self.endYear = ko.observable(trendComparisonData.end_year);
 
     self.regional = ko.observableArray(trendComparisonData.regional);
+    self.formattedRegional = ko.observableArray(GetArrayPercentChanged(trendComparisonData.regional));
 
     self.state = ko.observableArray(trendComparisonData.state);
+    self.formattedState = ko.observableArray(GetArrayPercentChanged(trendComparisonData.state));
 
     self.nation = ko.observableArray(trendComparisonData.nation);
+    self.formattedNation = ko.observableArray(GetArrayPercentChanged(trendComparisonData.nation));
 
     self.regionObject = ko.observable({});
     self.stateObject = ko.observable({});
     self.nationObject = ko.observable({});
 
-
+    self.years = ko.computed(function(){
+      let yearArray = [];
+      let yearSpan = (self.endYear() - self.startYear() + 1); //Add one to account for the start year
+      for(var i = 0; i < yearSpan; i++){
+        yearArray.push(String(self.startYear()+i))
+      }
+      return yearArray
+    });
     
+    function GetArrayPercentChanged(valueArray){
+        var newArray = []
+        for(var i = 0; i < valueArray.length; i++){
+          if(newArray.length == 0){
+            newArray.push(valueArray[0])
+          }else{
+            newArray.push(PercentageDifferenceBetweenTwoNumbers(valueArray[i],valueArray[i-1],2))
+          }
+        }
+        newArray[0] = 0; //Set the new formatted array's first number to 0, it is our baseline number.
+        return newArray;
+    }
   }
 
 
@@ -296,12 +347,12 @@
       self.jobs = ko.observable(industryData.jobs);
 
       self.calculatedOccupationInIndustry = ko.computed(function(){
-        return (( self.inOccupationJobs() / totalOccupationJobs) * 100).toFixed(1) + "%";
+        return PercentageDifferenceBetweenTwoNumbers(self.inOccupationJobs(),totalOccupationJobs,1) + "%";
         
       });
 
       self.calculatedTotalJobsInIndustry = ko.computed(function(){
-        return (( self.inOccupationJobs() / self.jobs()) * 100).toFixed(1) + "%";
+        return PercentageDifferenceBetweenTwoNumbers(self.inOccupationJobs(),self.jobs(),1)+ "%";
     });
     }
   }
