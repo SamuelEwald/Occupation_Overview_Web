@@ -42,11 +42,7 @@ function GetArrayPercentChanged(valueArray) {
       newArray.push(valueArray[0]);
     } else {
       newArray.push(
-        PercentageDifferenceBetweenTwoNumbers(
-          valueArray[i],
-          valueArray[i - 1],
-          2
-        )
+        PercentageDifferenceBetweenTwoNumbers(valueArray[i], valueArray[i - 1],2)
       );
     }
   }

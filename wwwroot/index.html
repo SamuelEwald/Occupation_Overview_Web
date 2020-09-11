@@ -64,7 +64,7 @@
           <div class="col-sm summary-item" data-bind="with: jobsGrowth">
             <span
               class="summary-subitem"
-              data-bind="text: regionalFormatted"
+              data-bind="text: regionalFormatted, css: { 'highlight-green': regionalGrowthPositive(), 'hightlight-red': !regionalGrowthPositive() }"
             ></span>
             <span
               class="summary-subitem"
@@ -72,7 +72,7 @@
             ></span>
             <span
               class="summary-subitem"
-              data-bind="text: nationalAvgFormatted"
+              data-bind="text: nationalAvgFormatted, css: { 'highlight-green': nationalAvgPositive(), 'hightlight-red': !nationalAvgPositive() }"
             ></span>
           </div>
           <div class="col-sm summary-item" data-bind="with: earnings">
@@ -94,7 +94,27 @@
         <h3><strong>Regional Trends</strong></h3>
         <div id="OccupationLineChart"></div>
         <table class="table">
+          <thead>
+            <tr></tr>
+              <th></th>
+              <th class="col-4" scope="col">Region</th>
+              <th class="col-2" scope="col">
+                <!-- ko text: startYear --><!-- /ko --> Jobs
+              </th>
+              <th class="col-2" scope="col">
+                <!-- ko text: endYear --><!-- /ko --> Jobs
+              </th>
+              <th class="col-2" scope="col">
+                Change
+              </th>
+              <th class="col-2" scope="col">
+                % Change
+              </th>
+            </tr>
+          </thead>
+          <tbody>
            
+          </tbody>
         </table>
       </section>
 

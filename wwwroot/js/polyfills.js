@@ -4,3 +4,10 @@ if (!Array.prototype.last){
         return this[this.length - 1];
     };
 };
+
+//Check if a number is positive
+if (!Number.prototype.isPositive){
+    Number.prototype.isPositive = function(){
+        return this > 0 ? true : false;
+    };
+};

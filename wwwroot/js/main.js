@@ -151,7 +151,7 @@
       var options = {
         vAxis: {
           title: "Percent Change",
-          slantedText:false,
+          slantedText: false,
         },
         hAxis: {
           minValue: trendObject.startYear(),
@@ -260,8 +260,17 @@
       self.regionalFormatted = ko.computed(function () {
         return FormatPercentageValueSign(self.regional()); //Ex. -20% OR +43%
       });
+      //Returns Number.isPositive() method value on the regional % 
+      self.regionalGrowthPositive = ko.computed(function(){
+        return self.regional().isPositive()
+      });
+
+
       self.nationalAvgFormatted = ko.computed(function () {
         return FormatPercentageValueSign(self.nationalAvg());
+      });
+      self.nationalAvgPositive = ko.computed(function(){
+        return self.nationalAvg().isPositive()
       });
     }
 
@@ -315,7 +324,25 @@
       }
       return yearArray;
     });
+
+    //FOR DEMONSTRATIVE PURPOSES ONLY
+    // self.regionGrowthTableRow = ko.observable(new GrowthTableItem("Region",self.regional()));
+    // self.stateGrowthTableRow = ko.observable(new GrowthTableItem("State",self.state()));
+    // self.nationGrowthTableRow = ko.observable(new GrowthTableItem("Nation",self.nation()));
+
+    //Nested Models
+    //FOR DEMONSTRATIVE PURPOSES ONLY
+    // function GrowthTableItem(title,region){
+    //    let self = this;
+    //    self.title = ko.observable(title);
+    //    self.startYearJobs = ko.observable(region[0]);
+    //    self.endYearJobs = ko.observable(region.last());
+    //    self.startToEndJobsChangeAmount = ko.observable();
+    //    self.startToEndJobsChangePercent = ko.observable();
+    // };
   }
+
+  
 
   function EmployingIndustries(employingIndustriesData) {
     var self = this;
@@ -347,11 +374,11 @@
       self.jobs = ko.observable(industryData.jobs);
 
       self.calculatedOccupationInIndustry = ko.computed(function () {
-        return (( self.inOccupationJobs() / totalOccupationJobs) * 100).toFixed(1) + "%";
+        return (((self.inOccupationJobs() / totalOccupationJobs) * 100).toFixed(1) +"%");
       });
 
       self.calculatedTotalJobsInIndustry = ko.computed(function () {
-        return (( self.inOccupationJobs() / self.jobs()) * 100).toFixed(1) + "%";
+        return ((self.inOccupationJobs() / self.jobs()) * 100).toFixed(1) + "%";
       });
     }
   }
